@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+
+    environment {
+        NODE_VERSION = '16' // Replace with your desired Node.js version
+    }
+
+    stages {
+        stage('Setup Environment') {
+            steps {
+                script {
+                    // Set up Node.js environment
+                    sh "nvm install ${NODE_VERSION} || true"
+                    sh "nvm use ${NODE_VERSION}"
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Build React App') {
+            steps {
+                dir('react-app') { // Change 'react-app' to your React app directory
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Test Node.js Backend') {
+            steps {
+                dir('node-backend') { // Change 'node-backend' to your Node.js backend directory
+                    sh 'npm test'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deployment logic goes here'
+                // Add your deployment steps
+                // For example:
+                // - Deploy frontend to S3/Cloud Storage
+                // - Deploy backend to a server/VM/container
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
+}
